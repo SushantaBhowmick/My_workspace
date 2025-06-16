@@ -34,3 +34,26 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+<!-- For supabase (for locally access)-->
+First globalli install supabase
+
+Then supabase login
+
+Then initilize supabase in your your project
+
+Then link with your project using supabase link
+
+
+<!-- Now as per your requirement migrate  -->
+Migrate command -  supabase migration new create_profiles_table
+
+then Chanags or add or update sql file as per your need then 
+
+cmd : Supabase db push
+
+
+<!-- For generating db tables types -->
+first set the project id in config.toml file(inside supabase)
+cmd: supabase gen types typescript --project-id zlqytllbcorfrkmqhmkx > src/types/supabase.types.ts 
