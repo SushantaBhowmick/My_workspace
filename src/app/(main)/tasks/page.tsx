@@ -9,7 +9,7 @@ import { Plus } from 'lucide-react'
 import showToast from '@/components/showToast'
 import { createClient } from '@/lib/supabase/supabaseClient'
 import { Task } from '@/lib/db-types'
-import { createTaskAction, deleteTaskAction, updateTaskAction } from '@/actions/tasks'
+import { createTaskAction, deleteTaskAction, updateTaskAction } from '../../actions/tasks'
 import Skeleton from 'react-loading-skeleton'
 
 export default function TasksPage() {

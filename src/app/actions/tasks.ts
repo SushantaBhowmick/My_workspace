@@ -1,12 +1,12 @@
 'use server'
 
-import { createServerSupabaseClient } from '@/lib/supabase/supabaseServer'
+import { createSupabaseServerClient } from '@/lib/supabase/supabaseServer'
 import { TablesInsert, TablesUpdate } from '@/types/supabase.types'
 import { revalidatePath } from 'next/cache'
 
 // Create a task
 export async function createTaskAction(title: string) {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createSupabaseServerClient()
 
   const {
     data: { user },
@@ -34,7 +34,7 @@ export async function updateTaskAction(
   id: string,
   updates: TablesUpdate<'tasks'>
 ) {
-  const supabase = createServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('tasks')
@@ -50,7 +50,7 @@ export async function updateTaskAction(
 
 // Delete a task
 export async function deleteTaskAction(id: string) {
-  const supabase = createServerClient()
+  const supabase =await createSupabaseServerClient()
 
   const { data, error } = await supabase
     .from('tasks')
@@ -61,5 +61,6 @@ export async function deleteTaskAction(id: string) {
 
   if (error) return null
 
+  
   return data
 }
