@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import showToast from "@/components/showToast";
 import { updateTaskAction, deleteTaskAction } from "../../actions/tasks";
 
@@ -37,7 +37,7 @@ export function TaskModal({
   onUpdate: (task: Task) => void;
 }) {
   const [title, setTitle] = useState(task.title);
-  const [status, setStatus] = useState(task.status || "todo");
+  const [status, setStatus] = useState(task.status || "pending");
   const [dueDate, setDueDate] = useState<Date | null>(
     task.due_date ? new Date(task.due_date) : null
   );
@@ -61,6 +61,12 @@ export function TaskModal({
     setLoading(false);
     onClose();
   };
+
+  useEffect(()=>{
+    setTitle(task.title)
+    setDueDate(task.due_date  ? new Date(task.due_date) : null)
+    setStatus(task.status || "pending")
+  },[task])
 
   const handleDelete = async () => {
     setLoading(true);
@@ -91,7 +97,7 @@ export function TaskModal({
               onChange={(e) => setStatus(e.target.value)}
               className="w-full border rounded p-2"
             >
-              <option value="todo">Todo</option>
+              <option value="pending">Pending</option>
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
             </select>
