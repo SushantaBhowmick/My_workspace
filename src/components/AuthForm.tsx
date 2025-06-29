@@ -12,6 +12,7 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import showToast from "./showToast";
+import { useUesrStore } from "@/store/useUserStore";
 
 type AuthType = "login" | "signup";
 
@@ -27,11 +28,12 @@ export default function AuthForm({ type }: { type: AuthType }) {
   const supabase = createClient();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const {setProfile} = useUesrStore();
 
   const onSubmit = async (data: FormData) => {
     setLoading(true)    
     const { email, password } = data;
-    const { error } =
+    const { data:{user},error } =
       type === "signup"
         ? await supabase.auth.signUp({
             email,

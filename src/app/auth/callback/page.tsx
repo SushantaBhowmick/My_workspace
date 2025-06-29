@@ -1,39 +1,86 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/supabaseClient';
-import showToast from '@/components/showToast';
+import { useSearchParams } from 'next/navigation';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 
 export default function AuthCallbackPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const supabase = createClient();
-  
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   useEffect(() => {
     const code = searchParams.get('code');
+    const next = searchParams.get('next') ?? '/dashboard';
 
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code)
-        .then(({ error }) => {
-          if (!error) {
-            showToast.success("Redirecting you to the dash board page.")
-            router.replace('/dashboard');
-          } else {
-            console.error('Session exchange failed:', error.message);
-            showToast.error('Verification failed. Please try logging in again.')
-            router.replace('/login');
-          }
-        });
-    } else {
-      router.replace('/login');
+    if (!code) {
+      setStatus('error');
+      return;
     }
-  }, [searchParams, router, supabase]);
+
+    const callbackUrl = `/api/auth/callback?code=${code}&next=${encodeURIComponent(next)}`;
+
+    fetch(callbackUrl)
+      .then((res) => {
+        if (res.redirected) {
+          window.location.href = res.url;
+        } else {
+          setStatus('error');
+        }
+      })
+      .catch(() => {
+        setStatus('error');
+      });
+  }, [searchParams]);
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <p className="text-lg font-medium text-gray-700">Verifying your account...</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-white px-6">
+      <div className="text-center space-y-4">
+        <AnimatePresence mode="wait">
+          {status === 'loading' && (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center"
+            >
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-2" />
+              <h2 className="text-xl font-semibold">Verifying your email...</h2>
+              <p className="text-gray-600">Please wait while we complete your sign in.</p>
+            </motion.div>
+          )}
+
+          {status === 'error' && (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center"
+            >
+              <XCircle className="h-12 w-12 text-red-500 mb-2" />
+              <h2 className="text-xl font-semibold text-red-600">Verification failed</h2>
+              <p className="text-gray-600">Something went wrong. Please try logging in again.</p>
+            </motion.div>
+          )}
+
+          {status === 'success' && (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center"
+            >
+              <CheckCircle2 className="h-12 w-12 text-green-500 mb-2" />
+              <h2 className="text-xl font-semibold text-green-600">Email verified!</h2>
+              <p className="text-gray-600">Redirecting you to your dashboard...</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

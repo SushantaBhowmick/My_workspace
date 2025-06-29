@@ -25,6 +25,7 @@ useEffect(() => {
     } = await supabase.auth.getUser()
 
     if (userError || !user) {
+      console.log(userError)
       showToast.error("Unable to fetch user info")
       hideLoader()
       return
@@ -40,11 +41,11 @@ useEffect(() => {
       showToast.error("Failed to fetch profile")
     } else {
       setProfile({
-        full_name: data.full_name,
+        full_name: data?.full_name!,
         email: user.email || '', // ← coming from auth.users
-        joined: new Date(data.created_at).toLocaleDateString(),
+        joined: new Date(data?.created_at!).toLocaleDateString(),
       })
-      setName(data.full_name)
+      setName(data?.full_name!)
     }
 
     hideLoader()
@@ -64,7 +65,7 @@ useEffect(() => {
     const { error } = await supabase
       .from("profiles")
       .update({ full_name: name })
-      .eq("id", user?.id)
+      .eq("id", user?.id!)
 
     if (error) {
       showToast.error("Update failed")

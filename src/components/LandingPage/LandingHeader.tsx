@@ -1,9 +1,11 @@
 "use client"
 import { Button } from "@/components/ui/button";
+import { useUesrStore } from "@/store/useUserStore";
 import { Home, Info, Phone, LayoutDashboard, LogIn } from "lucide-react";
 import Link from "next/link";
 
 export default function Header() {
+  const {profile} = useUesrStore();
   return (
     <header className="w-full shadow-sm bg-white border-b">
       <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-3">
@@ -21,14 +23,18 @@ export default function Header() {
           <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium">
             Contact
           </Link>
+          {
+            profile?
           <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 font-medium flex items-center">
             <LayoutDashboard className="w-4 h-4 mr-1" /> Dashboard
           </Link>
+          :
           <Link href="/login">
             <Button variant="outline" size="sm" className="flex items-center">
               <LogIn className="w-4 h-4 mr-1" /> Login
             </Button>
           </Link>
+          }
         </nav>
       </div>
     </header>

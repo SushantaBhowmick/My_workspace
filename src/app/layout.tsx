@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 // (main)/layout.tsx or root layout
 import 'react-loading-skeleton/dist/skeleton.css';
 import Loader from "./components/Loader";
+import StoreProvider from "@/store/StoreProvider";
 
 
 const geistSans = Geist({
@@ -33,6 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Loader />
+        <StoreProvider />
         {children}
         <Toaster position="top-center" richColors />
       </body>

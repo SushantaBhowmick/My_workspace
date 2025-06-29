@@ -3,13 +3,18 @@ import TaskRow from './TaskRow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export type Task = {
-    id: string;
-    title: string;
-    status: string;
-    due_date: string | null;
-    priority?: string;
-    tag?: string;
-    assigned_to?: string | null;
+   id: string;
+  title: string;
+  status: string | null;
+  priority: string | null;
+  due_date: string | null;
+  tag: string | null;
+  description?: string | null;
+  assigned_to?: string | null;
+  assigned_by?: string | null;
+  user_id?: string | null;
+  create_at?: string | null;
+  updated_at?: string | null;
   };
   
   type Props = {

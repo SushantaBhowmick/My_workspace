@@ -38,27 +38,45 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_by: string | null
+          assigned_to: string | null
           create_at: string | null
+          description: string | null
           due_date: string | null
           id: string
+          priority: string | null
           status: string | null
+          tag: string | null
           title: string
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
+          assigned_by?: string | null
+          assigned_to?: string | null
           create_at?: string | null
+          description?: string | null
           due_date?: string | null
           id?: string
+          priority?: string | null
           status?: string | null
+          tag?: string | null
           title: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
+          assigned_by?: string | null
+          assigned_to?: string | null
           create_at?: string | null
+          description?: string | null
           due_date?: string | null
           id?: string
+          priority?: string | null
           status?: string | null
+          tag?: string | null
           title?: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -68,7 +86,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_filtered_tasks: {
+        Args: {
+          _user_id: string
+          _status?: string
+          _priority?: string
+          _tag?: string
+          _search?: string
+          _assigned_to?: string
+          _start_date?: string
+          _end_date?: string
+          _offset?: number
+          _limit?: number
+        }
+        Returns: {
+          assigned_by: string | null
+          assigned_to: string | null
+          create_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string | null
+          status: string | null
+          tag: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

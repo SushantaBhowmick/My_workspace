@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/supabaseClient";
@@ -19,48 +19,58 @@ type FilterParams = {
   offset?: number;
 };
 
-export function useFilterTasks(filters:FilterParams,debounceDelay:number = 500){
-    const [debouncedFilters,setDebouncedFilters] = useState(filters)
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<any>(null);
+export function useFilterTasks(
+  filters: FilterParams,
+  debounceDelay: number = 500
+) {
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
 
-   useEffect(()=>{
-    const timeout = setTimeout(()=>{
-        setDebouncedFilters(filters)
-    },debounceDelay)
-    return ()=>clearTimeout(timeout)
-   },[filters]);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedFilters(filters);
+    }, debounceDelay);
+    return () => clearTimeout(timeout);
+  }, [filters]);
 
-   useEffect(()=>{
-    const fetchTasks = async ()=>{
-        setLoading(true)
-        const {data,error} = await supabase.rpc("get_filtered_tasks",{
-            _user_id: debouncedFilters.user_id,
-            _status: debouncedFilters.status ?? null,
-            _priority: debouncedFilters.priority ?? null,
-            _tag: debouncedFilters.tag ?? null,
-            _search: debouncedFilters.search ?? null,
-            _assigned_to: debouncedFilters.assigned_to ?? null,
-            _start_date: debouncedFilters.from ?? null,
-            _end_date: debouncedFilters.to ?? null,
-            _limit: debouncedFilters.limit ?? 10,
-            _offset: debouncedFilters.offset ?? 0,
-        })
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setLoading(true);
+      const filters = {
+        _user_id: debouncedFilters.user_id,
+        _status: debouncedFilters.status ?? undefined,
+        _priority: debouncedFilters.priority ?? undefined,
+        _tag: debouncedFilters.tag ?? undefined,
+        _search: debouncedFilters.search ?? undefined,
+        _assigned_to: debouncedFilters.assigned_to ?? undefined,
+        _start_date: debouncedFilters.from
+          ? debouncedFilters.from.toISOString().split("T")[0]
+          : undefined,
 
-        if (error) {
-            console.error(error);
-            setError(error);
-            setTasks([]);
-          } else {
-            setTasks(data || []);
-            setError(null);
-          }
-          setLoading(false);
-        };
+        _end_date: debouncedFilters.to
+          ? debouncedFilters.to.toISOString().split("T")[0]
+          : undefined,
+        _limit: debouncedFilters.limit ?? 10,
+        _offset: debouncedFilters.offset ?? 0,
+      }
+
+      const { data, error } = await supabase.rpc("get_filtered_tasks", filters);
+
+      if (error) {
+        console.error(error);
+        setError(error);
+        setTasks([]);
+      } else {
+        setTasks(data || []);
+        setError(null);
+      }
+      setLoading(false);
+    };
 
     fetchTasks();
-   },[debouncedFilters])
+  }, [debouncedFilters]);
 
-   return {tasks,loading,error}
+  return { tasks, loading, error };
 }

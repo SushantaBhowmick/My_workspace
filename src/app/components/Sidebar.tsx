@@ -31,15 +31,20 @@ export default function Sidebar() {
     if (error) {
       showToast.error("Error while Logout");
     } else {
+      localStorage.clear();
+      sessionStorage.clear()
       showToast.success("Logout Successfully!");
       router.replace("/login");
+      // window.location.href = "/login";
     }
   };
 
   return (
     <aside className="w-64 bg-white border-r h-screen p-4 flex flex-col justify-between">
       <div>
-        <h1 className="text-2xl font-bold mb-6 text-primary">Cypress</h1>
+        <Link href={'/'} className=" cursor-pointer">
+        <h1 className="text-2xl font-bold mb-6 text-primary">My_workspae</h1>
+        </Link>
         <nav className="flex flex-col gap-2">
           {navItems.map(({ name, href, icon: Icon }) => (
             <Link
