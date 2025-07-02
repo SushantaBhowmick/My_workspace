@@ -48,10 +48,14 @@ export default function AuthForm({ type }: { type: AuthType }) {
     setLoading(false)    
       showToast.error(error.message || "Authentication failed. Please try again.");
     } else {
+      if(!user) return;
     setLoading(false)    
       if (type === "signup") {
         showToast.success("Signup successful!","Verify your email");
       } else {
+        
+        const {data}= await supabase.from('profiles').select("*").eq("id",user?.id).single();
+        setProfile(data)
         showToast.success("Login successful!");
         router.push("/dashboard");
       }

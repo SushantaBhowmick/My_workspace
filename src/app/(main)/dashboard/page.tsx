@@ -1,10 +1,14 @@
+'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUesrStore } from "@/store/useUserStore";
 import { BarChart3, ClipboardList, UserCheck, FileText } from "lucide-react";
 
 export default function DashboardPage() {
+    const {profile}= useUesrStore();
+  
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Welcome back, Sushanta 👋</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Welcome back, {profile?.full_name ? profile.full_name.split(" ")[0]:"User"} 👋</h1>
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>

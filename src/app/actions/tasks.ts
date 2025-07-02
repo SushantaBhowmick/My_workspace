@@ -1,66 +1,49 @@
-'use server'
+"use server";
 
-import { createSupabaseServerClient } from '@/lib/supabase/supabaseServer'
-import { TablesInsert, TablesUpdate } from '@/types/supabase.types'
-import { revalidatePath } from 'next/cache'
+import { createSupabaseServerClient } from "@/lib/supabase/supabaseServer";
+import { TablesInsert, TablesUpdate } from "@/types/supabase.types";
+import { TaskType } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 // Create a task
-export async function createTaskAction(title: string) {
-  const supabase = await createSupabaseServerClient()
+export async function createTask(data: TaskType) {
+  const supabase = await createSupabaseServerClient();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await (await supabase).auth.getUser()
+  const { error } = await supabase.from("tasks").insert([data]);
 
-  if (userError || !user) return null
+  if (error) throw new Error(error.message);
 
-  const { data, error } = await supabase
-    .from('tasks')
-    .insert({
-      title,
-      user_id: user.id,
-    } satisfies TablesInsert<'tasks'>)
-    .select()
-    .single()
-
-  if (error) return null
-
-  return data
+  revalidatePath("/tasks");
 }
 
 // Update a task
-export async function updateTaskAction(
-  id: string,
-  updates: TablesUpdate<'tasks'>
-) {
-  const supabase = await createSupabaseServerClient()
+export async function updateTask(id:string,updates:Partial<TaskType>) {
+  const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from('tasks')
+    .from("tasks")
     .update(updates)
-    .eq('id', id)
+    .eq("id", id)
     .select()
-    .single()
+    .single();
 
-  if (error) return null
+  if (error) return null;
 
-  return data
+  return data;
 }
 
 // Delete a task
-export async function deleteTaskAction(id: string) {
-  const supabase =await createSupabaseServerClient()
+export async function deleteTask(id: string) {
+  const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from('tasks')
+    .from("tasks")
     .delete()
-    .eq('id', id)
+    .eq("id", id)
     .select()
-    .single()
+    .single();
 
-  if (error) return null
+  if (error) return null;
 
-  
-  return data
+  return data;
 }

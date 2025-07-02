@@ -1,27 +1,29 @@
 import React from 'react'
 import TaskRow from './TaskRow';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TaskType } from '@/types/types';
 
-export type Task = {
-   id: string;
-  title: string;
-  status: string | null;
-  priority: string | null;
-  due_date: string | null;
-  tag: string | null;
-  description?: string | null;
-  assigned_to?: string | null;
-  assigned_by?: string | null;
-  user_id?: string | null;
-  create_at?: string | null;
-  updated_at?: string | null;
-  };
+// export type Task = {
+//    id: string;
+//   title: string;
+//   status: string | null;
+//   priority: string | null;
+//   due_date: string | null;
+//   tag: string | null;
+//   description?: string | null;
+//   assigned_to?: string | null;
+//   assigned_by?: string | null;
+//   user_id?: string | null;
+//   create_at?: string | null;
+//   updated_at?: string | null;
+//   };
   
   type Props = {
-    tasks: Task[];
+    tasks: TaskType[];
+    onRefetch:()=>void;
   };
 
-const TaskTable = ({tasks}:Props) => {
+const TaskTable = ({tasks,onRefetch}:Props) => {
   return (
     <ScrollArea className="rounded-md border">
     <table className="min-w-full divide-y divide-muted text-sm text-left">
@@ -37,7 +39,7 @@ const TaskTable = ({tasks}:Props) => {
       </thead>
       <tbody className="divide-y divide-muted">
         {tasks.map((task) => (
-          <TaskRow key={task.id} task={task} />
+          <TaskRow key={task.id} task={task} onRefetch={onRefetch}/>
         ))}
       </tbody>
     </table>

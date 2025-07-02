@@ -4,31 +4,35 @@ import TaskModal from '@/app/components/tasks/TaskModal';
 import TaskTable from '@/app/components/tasks/TaskTable';
 import { Button } from '@/components/ui/button';
 import { useFilterTasks } from '@/hooks/useFilterTasks';
+import { useTaskStore } from '@/store/useTaskStore';
 import { useUesrStore } from '@/store/useUserStore';
-import React, { useState } from 'react'
-import { useForm } from 'react-hook-form';
+import React, { useMemo, useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form';
 // import {Session} from '@supabase/supabase-js'
 
 const page = () => {
   const [open, setOpen] = useState(false);
   const {profile}= useUesrStore();
   const form =useForm();
-const {watch} = form;
+  const values = useWatch({control:form.control})
 
-const filters ={
-  user_id: profile?.id ?? '', // 🔥 use Zustand
-    search: watch('search'),
-    status: watch('status'),
-    priority: watch('priority'),
-    tag: watch('tag'),
-    from: watch('from'),
-    to: watch('to'),
-    limit: 10,
-    offset: 0,
-}
+const filters = useMemo(() => ({
+  user_id: profile?.id ?? '',
+  search: values.search ?? null,
+  status: values.status ?? null,
+  priority: values.priority ?? null,
+  tag: values.tag ?? null,
+  from: values.from ?? null,
+  to: values.to ?? null,
+  limit: 10,
+  offset: 0,
+}), [values, profile?.id]);
 
 
-const {tasks,loading} = useFilterTasks(filters);
+const {loading,refetch} = useFilterTasks(filters);
+  const { tasks } = useTaskStore();
+// console.log(tasks);
+// const tasks=[]
 
   return (
     <section className="p-6 space-y-6">
@@ -38,7 +42,7 @@ const {tasks,loading} = useFilterTasks(filters);
     </div>
 
     <TaskFilterBar />
-    <TaskTable tasks={tasks} />
+    <TaskTable tasks={tasks} onRefetch={refetch}/>
 
     <TaskModal open={open} onOpenChange={setOpen} />
   </section>

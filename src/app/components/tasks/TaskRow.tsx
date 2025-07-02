@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useTransition } from "react";
-import { Task } from "./TaskTable";
+import React, { useRef, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -18,27 +17,60 @@ import {
 import { CalendarIcon, Loader2, Trash2Icon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { TaskType } from "@/types/types";
+import { useTaskStore } from "@/store/useTaskStore";
+import showToast from "@/components/showToast";
+import { deleteTask, updateTask } from "@/app/actions/tasks";
 
 type Props = {
-  task: Task;
+  task: TaskType;
+  onRefetch: () => void;
 };
 
-const TaskRow = ({ task }: Props) => {
+const TaskRow = ({ task,onRefetch }: Props) => {
   const [editingTask, setEditingTask] = useState(task);
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+   const { updateTask:updateTaskStore, deleteTask:deleteTaskStore ,addTask} = useTaskStore();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleChange = (field: keyof Task, value: any) => {
+
+  const handleChange = (field: keyof TaskType, value: any) => {
+    console.log(field)
     setEditingTask((prev) => ({ ...prev, [field]: value }));
 
-    startTransition(() => {
-      // TODO: Call your update RPC/API
+    if(timeoutRef.current){
+      console.log(timeoutRef)
+      clearTimeout(timeoutRef.current)
+    }
+
+    timeoutRef.current = setTimeout(() => {
+    startTransition(async() => {
+      try {
+        await updateTask(task.id,{[field]:value})
+        showToast.success("Task Updated");
+      } catch (error) {
+          showToast.error("Failed to update");
+        // updateTaskStore(task.id, { [field]: task[field] }); // rollback
+      }
       console.log("Update:", { ...editingTask, [field]: value });
     });
+    }, 500);
   };
 
   const handleDelete = () => {
     // TODO: Call delete RPC/API
+     deleteTaskStore(task.id); 
+     startTransition(async()=>{
+     try {
+       await deleteTask(task.id);
+      showToast.success("Task deleted");
+      onRefetch()
+     } catch (error) {
+      showToast.error("Delete failed")
+      addTask(task)
+     }
+     })
     console.log("Delete:", task.id);
   };
 
@@ -55,7 +87,7 @@ const TaskRow = ({ task }: Props) => {
       {/* Status */}
       <td className="px-4 py-2">
         <Select
-          value={editingTask.status}
+          value={editingTask.status||"pending"}
           onValueChange={(value) => handleChange("status", value)}
         >
           <SelectTrigger className="w-[120px]">
@@ -71,7 +103,7 @@ const TaskRow = ({ task }: Props) => {
         {/* Priority */}
         <td className="px-4 py-2">
           <Select
-            value={editingTask.priority}
+            value={editingTask.priority||"Normal"}
             onValueChange={(value) => handleChange("priority", value)}
           >
             <SelectTrigger className="w-[100px]">

@@ -34,8 +34,8 @@ export default function Sidebar() {
       localStorage.clear();
       sessionStorage.clear()
       showToast.success("Logout Successfully!");
+      // window.location.reload();
       router.replace("/login");
-      // window.location.href = "/login";
     }
   };
 
