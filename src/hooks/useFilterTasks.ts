@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/supabaseClient";
 import { Task } from "@/lib/db-types";
 import { useTaskStore } from "@/store/useTaskStore";
+import { string } from "zod";
 
 const supabase = createClient();
 
@@ -18,6 +19,8 @@ type FilterParams = {
   to?: Date | null;
   limit?: number;
   offset?: number;
+   order_by?: string;
+  order_dir?: 'asc' | 'desc';
 };
 
 export function useFilterTasks(
@@ -56,6 +59,9 @@ export function useFilterTasks(
         : undefined,
       _limit: debouncedFilters.limit ?? 10,
       _offset: debouncedFilters.offset ?? 0,
+      _order_by: debouncedFilters.order_by??'due_date',
+      _order_dir: debouncedFilters.order_dir??'desc'
+
     }
 
     const { data, error } = await supabase.rpc("get_filtered_tasks", filters);
